@@ -12,5 +12,7 @@ After vagrant up you'll be able to access your OpenShift instance at:https://okd
  - Vagrant
  - vagrant-hostmanager plugin
  - VirtualBox
-
-Tested only on MacOS.
+ 
+### Limitations
+ - Tested only on MacOS
+ - Only tested with VirtualBox
