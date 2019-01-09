@@ -1,0 +1,9 @@
+---
+
+- name: reexport directories
+  command: exportfs -r
+
+- name: restart NetworkManager
+  service:
+    name: NetworkManager
+    state: restarted

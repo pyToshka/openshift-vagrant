@@ -1,0 +1,27 @@
+---
+
+- name: Check PV does not already exist
+  command: oc get pv "{{ pv_name }}"
+  failed_when: False
+  changed_when: False
+  ignore_errors: True
+  register: oc_get_pv
+
+- name: Make source yaml file
+  template:
+    src: pv.j2
+    dest: /tmp/pv.yaml
+    owner: root
+    group: root
+    mode: 0644
+  when: oc_get_pv.rc != 0
+
+- name: Create persistent volume
+  command: oc create -f /tmp/pv.yaml
+  when: oc_get_pv.rc != 0
+
+- name: Remove temp file
+  file:
+    path: /tmp/pv.yaml
+    state: absent
+  when: oc_get_pv.rc != 0

@@ -1,0 +1,8 @@
+---
+
+- block:
+  - name: Post installation bespoking
+    include: postinstall.yml
+
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin/"

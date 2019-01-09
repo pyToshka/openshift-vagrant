@@ -1,0 +1,84 @@
+---
+- name: EPEL
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+- name: Pre-requisite packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - bash-completion
+    - libnfsidmap
+    - net-tools
+    - nfs-utils
+    - screen
+    - strace
+    - tcpdump
+    - wget
+    - python-passlib
+
+- name: Add developer user to htpasswd
+  htpasswd:
+    path: /etc/origin/master/htpasswd
+    name: "{{ developer_user }}"
+    password: "{{ developer_password }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Start NFS server services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - rpcbind
+    - nfs-server
+    - rpc-statd
+    - nfs-idmapd
+
+- name: Make root directory for NFS share
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ nfs_root | default('/nfsshare') }}"
+
+- name: Make directories for each persistent volume
+  file:
+    path: "{{ nfs_root | default('/nfsshare') }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0777
+  with_sequence: start=1 end="{{ persistent_volumes | default(3) }}" format=pv%04d
+
+- name: Put /etc/exports in place
+  template:
+    src: etc.exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reexport directories
+
+- name: Login as cluster admin
+  command: oc login -u system:admin
+  changed_when: False
+
+- name: Make persistent volumes
+  include: create_pv.yml pv_name="{{ item }}"
+  with_sequence: start=1 end="{{ persistent_volumes | default(3) }}" format=pv%04d
+
+- name: Restart Master if logging deployed
+  service:
+    name: origin-master
+    state: restarted
+  when: deploy_logging
+
+- name: System upgrade
+  yum: name=* state=latest update_cache=yes

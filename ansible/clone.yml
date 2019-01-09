@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: EPEL
+      yum:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    - name: Pre-requisite packages
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - git
+        - bash-completion
+        - net-tools
+        - java-1.8.0-openjdk-headless
+        - python2-passlib
+        - ansible
+        - htop
+    - name: Clone OpenShift Ansible git repo
+      git:
+        repo: https://github.com/openshift/openshift-ansible
+        dest: /home/vagrant/openshift-ansible
+        version: "release-{{ openshift_ansible_version | default('3.11') }}"
+        clone: yes
+        force: yes
+        update: yes
+      become: false

@@ -1,0 +1,6 @@
+developer_user: admin
+developer_password: admin
+nfs_root: /nfsshare
+persistent_volumes: 5
+deploy_logging: false
+deploy_metrics: false
