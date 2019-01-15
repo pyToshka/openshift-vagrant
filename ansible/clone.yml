@@ -17,6 +17,7 @@
         - python2-passlib
         - ansible
         - htop
+        - podman
     - name: Clone OpenShift Ansible git repo
       git:
         repo: https://github.com/openshift/openshift-ansible
