@@ -16,3 +16,4 @@ After vagrant up you'll be able to access your OpenShift instance at:https://okd
 ### Limitations
  - Tested only on MacOS
  - Only tested with VirtualBox
+ -te
