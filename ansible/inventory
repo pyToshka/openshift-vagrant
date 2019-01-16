@@ -40,8 +40,6 @@ openshift_hostname={{ ansible_fqdn }}
 # Additional services
 ## Ansible service broker
 ansible_service_broker_install=true
-## Metrics
-openshift_metrics_install_metrics=false
 ## Logging
 openshift_logging_install_logging=false
 openshift_logging_es_ops_nodeselector={"node-role.kubernetes.io/infra":"true"}
@@ -61,6 +59,7 @@ openshift_persistentlocalstorage_provisionner_image=quay.io/external_storage/loc
 
 # If use only cri-o runtime this must be commented
 # openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
+openshift_node_groups=[{'name': 'node-config-all-in-one-crio', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true', 'zone=dev'], 'edits': [{'key': 'kubeletArguments.container-runtime', 'value': ['remote']}, {'key': 'kubeletArguments.container-runtime-endpoint', 'value': ['/var/run/crio/crio.sock']}, {'key': 'kubeletArguments.image-service-endpoint', 'value': ['/var/run/crio/crio.sock']}, {'key': 'kubeletArguments.runtime-request-timeout', 'value': ['10m']}]}]
 
 # host group for masters
 [masters]
