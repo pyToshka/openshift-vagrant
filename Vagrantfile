@@ -8,12 +8,12 @@ N = 1
 REQUIRED_PLUGINS = %w(vagrant-hostmanager)
 errors = []
 def message(name)
-	"#{name} plugin is not installed, run `vagrant plugin install #{name}` to install it."
+    "#{name} plugin is not installed, run `vagrant plugin install #{name}` to install it."
 end
 REQUIRED_PLUGINS.each { |plugin| errors << message(plugin) unless Vagrant.has_plugin?(plugin) }
 unless errors.empty?
-	msg = errors.size > 1 ? "Errors: \n* #{errors.join("\n* ")}" : "Error: #{errors.first}"
-	fail Vagrant::Errors::VagrantError.new, msg
+    msg = errors.size > 1 ? "Errors: \n* #{errors.join("\n* ")}" : "Error: #{errors.first}"
+    fail Vagrant::Errors::VagrantError.new, msg
 end
 
 Vagrant.configure(2) do |config|
@@ -64,11 +64,12 @@ Vagrant.configure(2) do |config|
         preinstall.playbook = "/vagrant/ansible/clone.yml"
         preinstall.compatibility_mode = "2.0"
         preinstall.extra_vars = {
-          machine_ip:"10.0.0.11#{node_nr}",
-          master_route: hostname,
-          openshift_ansible_version: 3.11
+            machine_ip:"10.0.0.11#{node_nr}",
+            master_route: hostname,
+            openshift_ansible_version: 3.11
         }
       end
+
       config.vm.provision "ansible_local" do |prerequisites|
         prerequisites.provisioning_path = "/home/vagrant/openshift-ansible/playbooks/"
         prerequisites.compatibility_mode = "2.0"
@@ -78,10 +79,10 @@ Vagrant.configure(2) do |config|
         prerequisites.playbook_command = "sudo ANSIBLE_FORCE_COLOR=true ansible-playbook"
         prerequisites.playbook = "prerequisites.yml"
         prerequisites.extra_vars = {
-    			machine_ip: "10.0.0.11#{node_nr}",
-    			master_route: hostname,
-					openshift_ansible_version: 3.11
-    		}
+            machine_ip: "10.0.0.11#{node_nr}",
+            master_route: hostname,
+            openshift_ansible_version: 3.11
+        }
       end
 
       config.vm.provision "ansible_local" do |deploy_cluster|
@@ -93,27 +94,30 @@ Vagrant.configure(2) do |config|
         deploy_cluster.playbook_command = "sudo ANSIBLE_FORCE_COLOR=true ansible-playbook"
         deploy_cluster.playbook = "deploy_cluster.yml"
         deploy_cluster.extra_vars = {
-    			machine_ip: "10.0.0.11#{node_nr}",
-    			master_route: hostname,
-					openshift_ansible_version: 3.11
-    		}
+            machine_ip: "10.0.0.11#{node_nr}",
+            master_route: hostname,
+            openshift_ansible_version: 3.11
+        }
       end
+
       config.vm.provision "ansible_local" do |postinstall|
-    		postinstall.playbook = "/vagrant/ansible/site.yml"
+        postinstall.playbook = "/vagrant/ansible/site.yml"
         postinstall.compatibility_mode = "2.0"
-    		postinstall.extra_vars = {
-    			machine_ip:"10.0.0.11#{node_nr}",
-    			master_route: hostname,
-					openshift_ansible_version: 3.11
-    		}
+        postinstall.extra_vars = {
+            machine_ip:"10.0.0.11#{node_nr}",
+            master_route: hostname,
+            openshift_ansible_version: 3.11
+        }
       end
+
       config.trigger.after [:up, :reload, :provision] do |trigger|
         trigger.info = "OpenShift is ready!"
         trigger.run_remote = {
-          inline: 'echo "Openshift is available at: https://$1.$2.nip.io:8443" with admin:admin',
-          args: [hostname, "10.0.0.11#{node_nr}"]
+            inline: 'echo "Openshift is available at: https://$1.$2.nip.io:8443" with admin:admin',
+            args: [hostname, "10.0.0.11#{node_nr}"]
         }
       end
+
       node.vm.provision :shell, inline: "oc adm policy add-cluster-role-to-user cluster-admin admin", privileged:true
     end
   end

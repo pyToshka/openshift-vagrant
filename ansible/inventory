@@ -11,7 +11,7 @@ ansible_become=true
 openshift_deployment_type=origin
 
 # Image version
-openshift_image_tag=v3.11.0
+openshift_image_tag=v{{ openshift_ansible_version }}.0
 
 # Security
 ## uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
