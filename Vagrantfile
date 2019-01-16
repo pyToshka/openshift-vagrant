@@ -1,8 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 #
-cpu = 3
-mem = 5120
+cpu = 4
+mem = 8192
 project = 'okd'
 N = 1
 REQUIRED_PLUGINS = %w(vagrant-hostmanager)

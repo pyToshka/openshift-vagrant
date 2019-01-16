@@ -81,4 +81,7 @@
   when: deploy_logging
 
 - name: System upgrade
-  yum: name=* state=latest update_cache=yes
+  yum: 
+    name: '*' 
+    state: latest 
+    update_cache: yes
