@@ -9,7 +9,7 @@
       package:
         name: "{{ item }}"
         state: latest
-      with_items:
+      loop:
         - git
         - bash-completion
         - net-tools
