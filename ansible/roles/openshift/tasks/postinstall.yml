@@ -6,7 +6,7 @@
   package:
     name: "{{ item }}"
     state: latest
-  with_items:
+  loop:
     - bash-completion
     - libnfsidmap
     - net-tools
@@ -31,7 +31,7 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  with_items:
+  loop:
     - rpcbind
     - nfs-server
     - rpc-statd
@@ -44,7 +44,7 @@
     owner: root
     group: root
     mode: 0755
-  with_items:
+  loop:
     - "{{ nfs_root | default('/nfsshare') }}"
 
 - name: Make directories for each persistent volume
@@ -85,3 +85,18 @@
     name: '*' 
     state: latest 
     update_cache: yes
+
+- name: Add ASB repository
+  yum_repository:
+    name: asb
+    description: asb repository
+    baseurl: https://copr-be.cloud.fedoraproject.org/results/@ansible-service-broker/ansible-service-broker-latest/epel-7-$basearch/
+    gpgcheck: no
+
+- name: Install CLI tools for work with brokers
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - apb
+    - svcat
