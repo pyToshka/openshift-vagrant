@@ -1,0 +1,60 @@
+---
+- name: Backup master config file
+  copy:
+    src: /etc/origin/master/master-config.yaml
+    dest: /etc/origin/master/master-config.yaml.prepatch
+    remote_src: yes
+
+- name: Patch and enable new config master-config
+  shell: oc ex config patch /etc/origin/master/master-config.yaml.prepatch -p "$(cat /vagrant/ansible/roles/openshift/templates/{{ item }})" > /etc/origin/master/master-config.yaml
+  loop:
+    - master-config.patch
+
+- name: Reboot services
+  command: /usr/local/bin/master-restart "{{ item }}"
+  loop:
+     - api
+     - controllers
+
+- name: Create config file for elasticsearch
+  file: 
+    dest: /etc/sysctl.d/99-elasticsearch.conf
+    state: touch
+
+- name: Add configuration
+  lineinfile:
+    dest: /etc/sysctl.d/99-elasticsearch.conf
+    line: vm.max_map_count = 262144
+
+- name: Set new value for max count
+  command: sysctl vm.max_map_count=262144
+
+- name: Login with cluster-admin
+  shell: oc login -u system:admin
+  retries: 10
+  delay: 5
+  register: task_result
+  until: task_result.rc == 0
+
+- name: Give cluster-admin role to user admin
+  shell: oc adm policy add-cluster-role-to-user cluster-admin admin
+
+- name: Login with cluster-admin
+  shell: oc login -u admin -p admin
+  retries: 10
+  delay: 5
+  register: task_result
+  until: task_result.rc == 0
+
+- name: Create new project
+  shell: oc new-project istio-operator
+
+- name: Create istio operator
+  shell: oc new-app -f "{{ item }}" --param=OPENSHIFT_ISTIO_MASTER_PUBLIC_URL={{ master_route }}.{{ machine_ip }}.nip.io:8443
+  loop: 
+    - /vagrant/ansible/roles/openshift/templates/istio_operator.yaml
+
+- name: Deploy the Istio service mesh
+  shell: oc create -f "{{ item }}"
+  loop:
+    - /vagrant/ansible/roles/openshift/templates/cr_full.yaml
