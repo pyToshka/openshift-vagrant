@@ -11,10 +11,12 @@
     - master-config.patch
 
 - name: Reboot services
-  command: /usr/local/bin/master-restart "{{ item }}"
+  command: /usr/local/bin/master-restart "{{ service_item }}"
   loop:
      - api
      - controllers
+  loop_control:
+    loop_var: service_item
 
 - name: Create config file for elasticsearch
   file: 
@@ -50,11 +52,15 @@
   shell: oc new-project istio-operator
 
 - name: Create istio operator
-  shell: oc new-app -f "{{ item }}" --param=OPENSHIFT_ISTIO_MASTER_PUBLIC_URL={{ master_route }}.{{ machine_ip }}.nip.io:8443
+  shell: oc new-app -f "{{ operator_item }}" --param=OPENSHIFT_ISTIO_MASTER_PUBLIC_URL={{ master_route }}.{{ machine_ip }}.nip.io:8443
   loop: 
     - /vagrant/ansible/roles/openshift/templates/istio_operator.yaml
+  loop_control:
+    loop_var: operator_item
 
 - name: Deploy the Istio service mesh
-  shell: oc create -f "{{ item }}"
+  shell: oc create -f "{{ istio_item }}"
   loop:
     - /vagrant/ansible/roles/openshift/templates/cr_full.yaml
+  loop_control:
+    loop_var: istio_item
