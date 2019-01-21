@@ -1,8 +1,12 @@
 ---
-
 - block:
-  - name: Post installation bespoking
-    include: postinstall.yml
+  - name: Post installation
+    include: "{{ include_item }}"
+    loop:
+      - postinstall.yml
+      - servicemesh.yml
+    loop_control:
+      loop_var: include_item
 
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/bin/"

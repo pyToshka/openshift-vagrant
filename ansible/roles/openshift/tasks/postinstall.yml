@@ -2,11 +2,12 @@
 - name: EPEL
   yum:
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    
 - name: Pre-requisite packages
   package:
-    name: "{{ item }}"
+    name: "{{ package_item }}"
     state: latest
-  with_items:
+  loop:
     - bash-completion
     - libnfsidmap
     - net-tools
@@ -16,6 +17,8 @@
     - tcpdump
     - wget
     - python-passlib
+  loop_control:
+    loop_var: package_item
 
 - name: Add developer user to htpasswd
   htpasswd:
@@ -28,24 +31,28 @@
 
 - name: Start NFS server services
   service:
-    name: "{{ item }}"
+    name: "{{ service_item }}"
     state: started
     enabled: yes
-  with_items:
+  loop:
     - rpcbind
     - nfs-server
     - rpc-statd
     - nfs-idmapd
+  loop_control:
+    loop_var: service_item
 
 - name: Make root directory for NFS share
   file:
-    path: "{{ item }}"
+    path: "{{ file_item }}"
     state: directory
     owner: root
     group: root
     mode: 0755
-  with_items:
+  loop:
     - "{{ nfs_root | default('/nfsshare') }}"
+  loop_control:
+    loop_var: file_item
 
 - name: Make directories for each persistent volume
   file:
@@ -85,3 +92,20 @@
     name: '*' 
     state: latest 
     update_cache: yes
+
+- name: Add ASB repository
+  yum_repository:
+    name: asb
+    description: asb repository
+    baseurl: https://copr-be.cloud.fedoraproject.org/results/@ansible-service-broker/ansible-service-broker-latest/epel-7-$basearch/
+    gpgcheck: no
+
+- name: Install CLI tools for work with brokers
+  package:
+    name: "{{ package_cli_item }}"
+    state: latest
+  loop:
+    - apb
+    - svcat
+  loop_control:
+    loop_var: package_cli_item
