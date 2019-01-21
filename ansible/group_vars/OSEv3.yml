@@ -1,0 +1,76 @@
+# Ansible settings 
+ansible_become: true
+
+# OKD License
+openshift_deployment_type: origin
+
+# Image version
+openshift_image_tag: v{{ openshift_ansible_version }}.0
+
+# Security
+## uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
+openshift_master_identity_providers: 
+  - name: htpasswd_auth
+    login: true
+    challenge: true
+    kind: HTPasswdPasswordIdentityProvider
+
+## Defining htpasswd users admin:admin by default
+openshift_master_htpasswd_users: {'admin': '$apr1$Mf7W16Gb$6qoVR4GSLFueI4XpdMSa60'}
+
+# Disable checks
+openshift_disable_check: memory_availability,disk_availability,docker_storage
+
+# Use only CRI-O
+openshift_use_crio: True
+openshift_use_crio_only: True
+
+# Network
+openshift_ip: "{{ machine_ip }}"
+
+# Additional repository
+# openshift_release: "{{ openshift_ansible_version }}"
+# openshift_additional_repos:
+#   - id: centos-okd-ci
+#     name: centos-okd-ci
+#     baseurl: https://rpms.svc.ci.openshift.org/openshift-origin-v{{ openshift_ansible_version }}
+#     gpgcheck: 0
+#     enabled: 1
+
+# DNS settings
+openshift_hostname: "{{ ansible_fqdn }}"
+
+# Additional services
+## Ansible service broker
+ansible_service_broker_install: true
+## Logging
+openshift_logging_install_logging: false
+openshift_logging_es_ops_nodeselector: {"node-role.kubernetes.io/infra":"true"}
+openshift_logging_es_nodeselector: {"node-role.kubernetes.io/infra":"true"}
+
+# OKD URLs
+openshift_master_public_api_url: https://{{ dns_name }}:8443
+openshift_master_public_console_url: https://{{ dns_name }}:8443/console
+openshift_master_cluster_public_hostname: "{{ dns_name }}"
+openshift_master_default_subdomain: apps.{{ dns_name }}
+
+# PVs settings
+openshift_persistentlocalstorage_enabled: True
+openshift_persistentlocalstorage_classes: []
+openshift_persistentlocalstorage_path: /mnt/local-storage
+openshift_persistentlocalstorage_provisionner_image: quay.io/external_storage/local-volume-provisioner:v1.0.1
+
+# If use only cri-o runtime this must be commented
+# openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
+openshift_node_groups: 
+  - name: node-config-all-in-one-crio
+    labels: 
+      - 'node-role.kubernetes.io/master=true'
+      - 'node-role.kubernetes.io/infra=true'
+      - 'node-role.kubernetes.io/compute=true'
+      - 'zone=dev'
+    edits: 
+      - {'key': 'kubeletArguments.container-runtime', 'value': ['remote']}
+      - {'key': 'kubeletArguments.container-runtime-endpoint', 'value': ['unix:///var/run/crio/crio.sock']}
+      - {'key': 'kubeletArguments.image-service-endpoint', 'value': ['unix:///var/run/crio/crio.sock']}
+      - {'key': 'kubeletArguments.runtime-request-timeout', 'value': ['10m']}

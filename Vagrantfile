@@ -96,7 +96,8 @@ Vagrant.configure(2) do |config|
         deploy_cluster.extra_vars = {
             machine_ip: "10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            dns_name: "#{hostname}.10.0.0.11#{node_nr}.nip.io"
         }
       end
 
