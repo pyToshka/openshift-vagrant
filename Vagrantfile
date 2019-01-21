@@ -107,7 +107,7 @@ Vagrant.configure(2) do |config|
         postinstall.extra_vars = {
             machine_ip:"10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11,
+            openshift_ansible_version: 3.11
         }
       end
 
