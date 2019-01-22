@@ -5,7 +5,7 @@ cpu = 4
 mem = 8192
 project = 'okd'
 N = 1
-REQUIRED_PLUGINS = %w(vagrant-hostmanager)
+REQUIRED_PLUGINS = %w(vagrant-hostmanager vagrant-cachier)
 errors = []
 def message(name)
     "#{name} plugin is not installed, run `vagrant plugin install #{name}` to install it."
@@ -21,10 +21,23 @@ Vagrant.configure(2) do |config|
   # vm specs
   #
   config.vm.provider "virtualbox" do |v|
-    v.memory = mem
-    v.cpus = cpu
-  end
+    v.name = project
+    host = RbConfig::CONFIG['host_os']
+    # Give 1/4 from system memory
+    if host =~ /darwin/
+      cpus = `sysctl -n hw.ncpu`.to_i
+      mem = `sysctl -n hw.memsize`.to_i / 1024 / 1024 / 4
+    elsif host =~ /linux/
+      cpus = `nproc`.to_i
+      mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 1024 / 4
+    else # sorry Windows users, I can't help you :-)
+      cpus = cpu
+      mem = mem
+    end
 
+    v.customize ["modifyvm", :id, "--memory", mem]
+    v.customize ["modifyvm", :id, "--cpus", cpus]
+  end
   #
   # Use insecure key
   config.ssh.insert_key = false
@@ -33,6 +46,15 @@ Vagrant.configure(2) do |config|
   #
   # Configre private_ip as hostname
   #
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.auto_detect = true
+    config.cache.scope = :box
+    config.cache.synced_folder_opts = {
+      type: :nfs,
+      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    }
+  end
+
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
@@ -66,7 +88,8 @@ Vagrant.configure(2) do |config|
         preinstall.extra_vars = {
             machine_ip:"10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            ANSIBLE_CACHE_PLUGIN:"jsonfile"
         }
       end
 
@@ -81,7 +104,8 @@ Vagrant.configure(2) do |config|
         prerequisites.extra_vars = {
             machine_ip: "10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            ANSIBLE_CACHE_PLUGIN:"jsonfile"
         }
       end
 
@@ -96,7 +120,8 @@ Vagrant.configure(2) do |config|
         deploy_cluster.extra_vars = {
             machine_ip: "10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            ANSIBLE_CACHE_PLUGIN:"jsonfile"
         }
       end
 
@@ -106,7 +131,8 @@ Vagrant.configure(2) do |config|
         postinstall.extra_vars = {
             machine_ip:"10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            ANSIBLE_CACHE_PLUGIN:"jsonfile"
         }
       end
 

@@ -9,7 +9,6 @@ etcd
 ansible_become=true
 # OKD License
 openshift_deployment_type=origin
-
 # Image version
 openshift_image_tag=v{{ openshift_ansible_version }}.0
 
