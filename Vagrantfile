@@ -82,7 +82,7 @@ Vagrant.configure(2) do |config|
       # Remove default Vagrant hostfile line, we want to use hostmanager
       #
       node.vm.provision :shell, inline: "sed -i'' '/^127.0.0.1\\t#{node.vm.hostname}\\t#{hostname}$/d' /etc/hosts"
-      config.vm.provision "ansible_local" do |preinstall|
+      config.vm.provision "preinstall",  type: "ansible_local" do |preinstall|
         preinstall.playbook = "/vagrant/ansible/clone.yml"
         preinstall.compatibility_mode = "2.0"
         preinstall.extra_vars = {
@@ -93,7 +93,7 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      config.vm.provision "ansible_local" do |prerequisites|
+      config.vm.provision "prerequisites", type: "ansible_local" do |prerequisites|
         prerequisites.provisioning_path = "/home/vagrant/openshift-ansible/playbooks/"
         prerequisites.compatibility_mode = "2.0"
         prerequisites.verbose = true
@@ -109,7 +109,7 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      config.vm.provision "ansible_local" do |deploy_cluster|
+      config.vm.provision "deploy_cluster", type: "ansible_local" do |deploy_cluster|
         deploy_cluster.provisioning_path = "/home/vagrant/openshift-ansible/playbooks/"
         deploy_cluster.compatibility_mode = "2.0"
         deploy_cluster.verbose = true
@@ -125,7 +125,7 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      config.vm.provision "ansible_local" do |postinstall|
+      config.vm.provision "postinstall", type: "ansible_local" do |postinstall|
         postinstall.playbook = "/vagrant/ansible/site.yml"
         postinstall.compatibility_mode = "2.0"
         postinstall.extra_vars = {
