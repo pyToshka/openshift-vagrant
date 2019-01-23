@@ -8,9 +8,26 @@ openshift_deployment_type: origin
 openshift_image_tag: v{{ openshift_ansible_version }}.0
 
 # Security
-## uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
-openshift_master_identity_providers: 
-  - name: htpasswd_auth
+openshift_master_identity_providers:
+  # - name: LDAP
+  #   challenge: false
+  #   login: true
+  #   mappingMethod: claim
+  #   kind: LDAPPasswordIdentityProvider
+  #   attributes:
+  #       id:
+  #       - dn
+  #       email:
+  #       - mail
+  #       name:
+  #       - cn
+  #       preferredUsername:
+  #       - uid
+  #   bindDN: ''
+  #   bindPassword: ''
+  #   insecure: true
+  #   url: "ldap://host:port/basedn?attribute?scope?filter"
+  - name: HTTP
     login: true
     challenge: true
     kind: HTPasswdPasswordIdentityProvider
