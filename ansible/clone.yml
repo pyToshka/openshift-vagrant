@@ -16,6 +16,7 @@
         - java-1.8.0-openjdk-headless
         - python2-passlib
         - ansible
+        - pyOpenSSL
         - htop
         - podman
       loop_control:
