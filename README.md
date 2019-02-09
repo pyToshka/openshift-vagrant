@@ -76,18 +76,21 @@ openshift_master_cluster_public_hostname: "okd-vagrant.domain.com"
 openshift_master_default_subdomain: "apps.okd-vagrant.domain.com"
 ```
 
-### Dependency
+## LDAP
+LDAP configuratine in vars file located in `group_vars` in file `OSEv3.yml`.
+
+## Dependency
 
  - Vagrant
  - vagrant-hostmanager plugin
  - VirtualBox
 
-### Limitations
+## Limitations
 
  - Tested only on MacOS, Suse
  - Only tested with VirtualBox
 
-### Updates:
+## Updates:
 
  - Cri-O support many thanks to [Asgoret](https://github.com/Asgoret)
  - Testing on Linux Suse many thanks to [gecube](https://github.com/gecube)
