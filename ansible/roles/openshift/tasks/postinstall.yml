@@ -2,7 +2,7 @@
 - name: EPEL
   yum:
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
-    
+
 - name: Pre-requisite packages
   package:
     name: "{{ package_item }}"
@@ -88,9 +88,9 @@
   when: deploy_logging
 
 - name: System upgrade
-  yum: 
-    name: '*' 
-    state: latest 
+  yum:
+    name: '*'
+    state: latest
     update_cache: yes
 
 - name: Add ASB repository
@@ -106,6 +106,6 @@
     state: latest
   loop:
     - apb
-    - svcat
+  #  - svcat
   loop_control:
     loop_var: package_cli_item
