@@ -70,7 +70,7 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      config.vm.provision "ansible_local" do |prerequisites|
+      config.vm.provision "prerequisites", type:"ansible_local"  do |prerequisites|
         prerequisites.provisioning_path = "/home/vagrant/openshift-ansible/playbooks/"
         prerequisites.compatibility_mode = "2.0"
         prerequisites.verbose = true
@@ -85,7 +85,7 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      config.vm.provision "ansible_local" do |deploy_cluster|
+      config.vm.provision "deploy_cluster", type:"ansible_local" do |deploy_cluster|
         deploy_cluster.provisioning_path = "/home/vagrant/openshift-ansible/playbooks/"
         deploy_cluster.compatibility_mode = "2.0"
         deploy_cluster.verbose = true
@@ -96,11 +96,12 @@ Vagrant.configure(2) do |config|
         deploy_cluster.extra_vars = {
             machine_ip: "10.0.0.11#{node_nr}",
             master_route: hostname,
-            openshift_ansible_version: 3.11
+            openshift_ansible_version: 3.11,
+            dns_name: "#{hostname}.10.0.0.11#{node_nr}.nip.io"
         }
       end
 
-      config.vm.provision "ansible_local" do |postinstall|
+      config.vm.provision "postinstall", type:"ansible_local" do |postinstall|
         postinstall.playbook = "/vagrant/ansible/site.yml"
         postinstall.compatibility_mode = "2.0"
         postinstall.extra_vars = {

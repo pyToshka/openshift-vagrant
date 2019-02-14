@@ -106,6 +106,6 @@
     state: latest
   loop:
     - apb
-  #  - svcat
+#    - svcat
   loop_control:
     loop_var: package_cli_item

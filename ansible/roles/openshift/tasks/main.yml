@@ -1,5 +1,6 @@
 ---
-- block:
+- name: Main task 
+  block:
   - name: Post installation
     include: "{{ include_item }}"
     loop:
