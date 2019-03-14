@@ -18,7 +18,7 @@ openshift_deployment_type=origin
 openshift_image_tag=v{{ openshift_ansible_version }}
 
 # Disable checks
-openshift_disable_check=disk_availability,docker_image_availability
+openshift_disable_check=docker_image_availability,memory_availability,disk_availability,docker_storage,docker_storage_driver,package_version,package_availability,package_update
 
 # Security
 ## uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
@@ -26,9 +26,6 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 
 ## Defining htpasswd users admin:admin by default
 openshift_master_htpasswd_users={'admin': '$apr1$Mf7W16Gb$6qoVR4GSLFueI4XpdMSa60'}
-
-# Disable checks
-openshift_disable_check=memory_availability,disk_availability,docker_storage
 
 # Install and run cri-o.
 openshift_use_crio=True
